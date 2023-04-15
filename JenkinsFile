@@ -1,0 +1,54 @@
+pipeline{
+    agent any
+    
+    environment {
+        dotnet ='\usr\bin\dotnet'
+        }
+        
+    triggers {
+        pollSCM '* * * * *'
+    }
+
+
+ stage('Checkout') {
+    steps {
+     git branch: 'test_dotnet_sample', credentialsId: '2aeba635-eddd-4b5e-886b-f71cbf5b2efb', url: 'https://github.com/Prasana1987/Samples_ASPDOTNET.git/'
+    }
+ }
+
+ stage('Restore packages'){
+   steps{
+      sh "dotnet restore $WORKSPACE/samples/aspnet/WebApi/WebFormSample/WebForm/WebFormSample.sln"
+     }
+  }
+
+  stage('Clean'){
+    steps{
+        sh "dotnet clean $WORKSPACE/samples/aspnet/WebApi/WebFormSample/WebForm/WebForm.csproj"
+     }
+   }
+
+   stage('Build'){
+   steps{
+      sh "dotnet build $WORKSPACE/samples/aspnet/WebApi/WebFormSample/WebForm/WebForm.csproj --configuration Release"
+    }
+ }
+
+/* stage('Test: Unit Test'){
+   steps {
+     bat "dotnet test YourProjectPath\\UnitTest_Project.csproj"
+     }
+  }
+       
+ stage('Test: Integration Test'){
+    steps {
+       bat "dotnet test ProjectPath\\IntegrateTest_Project.csproj"
+      }
+   }*/
+
+   stage('Publish'){
+     steps{
+       sh "dotnet publish $WORKSPACE/samples/aspnet/WebApi/WebFormSample/WebForm/WebForm.csproj"
+       
+     }
+}
